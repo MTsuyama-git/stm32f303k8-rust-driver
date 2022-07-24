@@ -1,7 +1,7 @@
 use crate::vcell::VolatileCell;
 use core::ops::{Deref, DerefMut};
 
-const NVIC_ADDR: u32 = 0xE000E100;
+const NVIC_ADDR: u32 = 0xE000_E100;
 
 #[repr(C)]
 pub struct NVICRegs {

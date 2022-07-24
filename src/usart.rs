@@ -44,17 +44,17 @@ pub fn init_usart2() {
     usart2.cr1 |= (1 << 5) | (1 << 3) | (1 << 2) | 1;
     usart2.cr2 &= 0;
     usart2.cr3 &= 0;
-    usart2.brr.write(8000000 / 115200);
+    usart2.brr <<= 8000000 / 115200;
 }
 
 pub fn usart2_print0(input: String) {
-    let usart2 = USART2::new();
+    let mut usart2 = USART2::new();
     for c in input.as_bytes().iter() {
         let mut _isr_state = usart2.isr.read() & (1 << 7);
         while _isr_state & (1 << 7) == 0 {
             _isr_state = usart2.isr.read() & (1 << 7);
         }
-        usart2.tdr.write(From::from(*c));
+        usart2.tdr <<= From::from(*c);
     }
 }
 
@@ -65,11 +65,15 @@ pub fn usart2_print(input: &str) {
 
 #[no_mangle]
 pub extern "C" fn USART2_IRQ() {
-    let usart2 = USART2::new();
+    let mut usart2 = USART2::new();
     let isr_reg = usart2.isr.read();
     if isr_reg & (1 << 5) != 0 {
         let data: u8 = TryFrom::try_from(usart2.rdr.read()).unwrap();
-        usart2.tdr.write(From::from(data));
+        let mut _isr_state = usart2.isr.read() & (1 << 7);
+        while _isr_state & (1 << 7) == 0 {
+            _isr_state = usart2.isr.read() & (1 << 7);
+        }
+        usart2.tdr <<= From::from(data);
     }
 }
 

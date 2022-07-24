@@ -1,17 +1,42 @@
-// use cortex_m_semihosting::hprintln;
-use core::ptr::write_volatile;
+use core::ops::{Deref, DerefMut};
+use crate::vcell::VolatileCell;
 
-const CSR_ADDR: usize = 0xE000_E010;
-const RVR_ADDR: usize = 0xE000_E014;
-const CVR_ADDR: usize = 0xE000_E018;
+const STK_ADDR: u32 = 0xE000_E010;
+
+#[repr(C)]
+pub struct SysTickRegs {
+    pub ctrl: VolatileCell<u32>,
+    pub load: VolatileCell<u32>,
+    pub val: VolatileCell<u32>,
+    pub calib: VolatileCell<u32>,
+}
+
+pub struct STK;
+impl STK {
+    pub fn new() -> Self {
+        return Self {};
+    }
+}
+
+impl Deref for STK {
+    type Target = SysTickRegs;
+    fn deref(&self) -> &Self::Target {
+        let _ret = STK_ADDR as *const SysTickRegs;
+        unsafe { &*_ret }
+    }
+}
+
+impl DerefMut for STK {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        let _ret = STK_ADDR as *mut SysTickRegs;
+        unsafe { &mut *_ret }
+    }
+}
 
 pub fn init() {
-    // hprintln!("Systick init").unwrap();
-    unsafe {
-	write_volatile(CVR_ADDR as *mut u32, 0);
-	write_volatile(RVR_ADDR as *mut u32, 1 << 20);
-	write_volatile(CSR_ADDR as *mut u32, 0x3);
-    }
-    
+    let mut stk = STK::new();
+    stk.val &= 0;
+    stk.load <<= 1 << 20;
+    stk.ctrl |= 0x03; 
 }
 
