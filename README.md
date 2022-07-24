@@ -10,7 +10,7 @@
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 ```
-1. install target
+2. install target
 ```
 rustup target add thumbv7em-none-eabihf 
 ```
@@ -25,22 +25,22 @@ cargo build
 ```
 openocd -f stm32f3xx_stlink_v2.cfg 
 ```
-1. connect gdb server with arm-none-eabi-gdb and load program
+2. connect gdb server with arm-none-eabi-gdb and load program
 ```
 arm-none-eabi-gdb target/thumbv7em-none-eabihf/debug/sample
 (gdb) target remote :3333
 (gdb) load
 ```
-1. enable semihosting(when use arm semihosting)
+3. enable semihosting(when use arm semihosting)
 ```
 (gdb) monitor arm semihosting enable
 ```
-1. continue the program
+4. continue the program
 ```
 continue
 ```
 
-## Deploy binary to target
+## Install binary to Nucleo
 ```
 openocd -f stm32f3xx_stlink_v2.cfg -c "program target/thumbv7em-none-eabihf/debug/sample verify reset exit"
 ```
