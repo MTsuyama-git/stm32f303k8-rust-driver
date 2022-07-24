@@ -19,7 +19,7 @@ use interrupt_vector::Vector;
 #[global_allocator]
 static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 
-static mut I: u8 = 0;
+static mut I: u8 = 1;
 
 #[panic_handler]
 fn panic(_panic: &PanicInfo<'_>) -> ! {
